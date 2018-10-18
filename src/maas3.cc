@@ -8,6 +8,7 @@
  */
 
 #include <iostream>
+#include <fstream>
 #include <string>
 
 //Voert het infoblok uit naar de standaarduitvoer
@@ -24,9 +25,52 @@ void infoBlokje(){
 	"////////////////////////////////////////////////\n" << std::endl;
 }
 
+class nonogram{
+public:
+	nonogram(){
+		m = 10;
+		n = 10;
+		stop = 0;
+		cursorX = m / 2;
+		cursorY = n / 2;
+	}
+	
+	void teken(){
+		for(int i = 0;i < 2 * n + 2;i++) std::cout << "-";
+		std::cout << std::endl;
+		for(int i = 0;i < m;i++){
+			std::cout << "|";
+			for(int j = 0;j < n;j++){
+				if(cursorX == i && cursorY == j) std::cout << (veld[i][j] ? "*" : "_") << " ";
+				else std::cout << (veld[i][j] ? "X" : " ") << " ";
+			}
+			std::cout << "|" << std::endl;
+		}
+		for(int i = 0;i < 2 * n + 2;i++) std::cout << "-";
+		std::cout << std::endl;
+	}
+	
+	void menu(){
+		teken();
+		char c = std::cin.get();
+		while(c == '\n') c = std::cin.get(); //Negeer newlines
+		if(c == 's' || c == 'S') stop = 1;
+	}
+	
+	int stop;
+private:
+	const static int maxVeld = 100;
+	int m, n, cursorX, cursorY;
+	bool veld[maxVeld][maxVeld] = {};
+};
+
 int main(){
 	//Print het infoblok
 	infoBlokje();
+	
+	nonogram ng = nonogram();
+	
+	while(!ng.stop) ng.menu();
 	
 	return 0;
 }
