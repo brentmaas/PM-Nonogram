@@ -32,8 +32,8 @@ public:
 		m = 10;
 		n = 10;
 		stop = 0;
-		cursorX = m / 2;
-		cursorY = n / 2;
+		cursorX = n / 2;
+		cursorY = m / 2;
 		menuDiepte = 0;
 		randomP = 50;
 		cursorOptie = 0;
@@ -73,8 +73,41 @@ public:
 	}
 	
 	void controleer(){
-		for(int x = 0;x < n;x++){
-			
+		for(int i = 0;i < maxVeld;i++){
+			goedH[i] = true;
+			goedV[i] = true;
+		}
+		for(int x = 0;x < maxVeld;x++){
+			int i = 0, teller = 0;
+			for(int y = 0;y < maxVeld;y++){
+				if(veld[x][y]){
+					teller++;
+				}else if(teller > 0){
+					if(teller != beschrijvingV[x][i]){
+						goedV[x] = false;
+						break;
+					}
+					i++;
+					teller = 0;
+				}
+			}
+			if(teller != beschrijvingV[x][i]) goedV[x] = false;
+		}
+		for(int y = 0;y < maxVeld;y++){
+			int i = 0, teller = 0;
+			for(int x = 0;x < maxVeld;x++){
+				if(veld[x][y]){
+					teller++;
+				}else if(teller > 0){
+					if(teller != beschrijvingH[y][i]){
+						goedH[y] = false;
+						break;
+					}
+					i++;
+					teller = 0;
+				}
+			}
+			if(teller != beschrijvingH[y][i]) goedH[y] = false;
 		}
 	}
 	
@@ -98,6 +131,7 @@ public:
 		}
 		for(int i = 0;i < 2 * n + 2;i++) std::cout << "-";
 		std::cout << std::endl;
+		bool eennalaatste = false;
 		for(int y = 0;y < maxVeld / 2 + maxVeld % 2 + 1;y++){
 			bool schrijf = false;
 			std::string buffer = "";
@@ -106,21 +140,21 @@ public:
 				schrijf = schrijf || b != 0;
 				buffer += " ";
 				if(b != 0) buffer += beschrijvingChar(b);
+				else if((y > 0 && beschrijvingV[x][y-1] != 0 && goedV[x]) || (y == 0 && beschrijvingV[x][0] == 0 && goedV[x])) buffer += "V";
 				else buffer += " ";
 			}
-			if(schrijf){
-				std::cout << buffer << std::endl;
-			}else{
-				break;
+			if(!schrijf && !eennalaatste){
+				eennalaatste = true;
+				schrijf = true;
 			}
+			if(schrijf) std::cout << buffer << std::endl;
+			else break;
 		}
 		if(metMenu){
 			if(menuDiepte == 0){
-				std::cout << "S[T]op,[O]pties,[W]Omhoog,[S]Omlaag,[A]Links,[D]Rechts,[F]Toggle,[R]andom" << std::endl;
-				std::cout << "[L]eeg,Beschrijving:[C]Lees[V]Schrijf[B]update[N]ul,Beeld:[J]Lees[K]Schrijf" << std::endl;
-			}else if(menuDiepte == 1){
-				std::cout << "[T]erug,[G]rootte wijzigen,[C]ursoropties,[R]andompercentage" << std::endl;
-			}
+				std::cout << "S[T]op, [O]pties, [W]Omhoog, [S]Omlaag, [A]Links, [D]Rechts, [F]Toggle, [R]andom" << std::endl;
+				std::cout << "[L]eeg, Beschrijving: [C]Lees [V]Schrijf [B]update [N]ul, Beeld: [J]Lees [K]Schrijf" << std::endl;
+			}else if(menuDiepte == 1) std::cout << "[T]erug, [G]rootte wijzigen, [C]ursoropties, [R]andompercentage" << std::endl;
 		}
 	}
 	
@@ -150,16 +184,12 @@ public:
 	}
 	
 	void vulRandom(){
-		for(int x = 0;x < n;x++) for(int y = 0;y < m;y++){
-			veld[x][y] = randomPercentage() < randomP;
-		}
+		for(int x = 0;x < n;x++) for(int y = 0;y < m;y++) veld[x][y] = randomPercentage() < randomP;
 		controleer();
 	}
 	
 	void leeg(){
-		for(int x = 0;x < n;x++) for(int y = 0;y < m;y++){
-			veld[x][y] = 0;
-		}
+		for(int x = 0;x < n;x++) for(int y = 0;y < m;y++) veld[x][y] = 0;
 		controleer();
 	}
 	
@@ -182,19 +212,18 @@ public:
 	}
 	
 	void beschrijvingUpdate(){
+		beschrijvingNul();
 		for(int i = 0;i < maxVeld;i++){
 			int iV = 0, tellerV = 0, iH = 0, tellerH = 0;
 			for(int y = 0;y < maxVeld;y++){
-				if(veld[i][y]){
-					tellerV++;
-				}else if(tellerV > 0){
+				if(veld[i][y]) tellerV++;
+				else if(tellerV > 0){
 					beschrijvingV[i][iV] = tellerV;
 					iV++;
 					tellerV = 0;
 				}
-				if(veld[y][i]){
-					tellerH++;
-				}else if(tellerH > 0){
+				if(veld[y][i]) tellerH++;
+				else if(tellerH > 0){
 					beschrijvingH[i][iH] = tellerH;
 					iH++;
 					tellerH = 0;
@@ -228,7 +257,7 @@ public:
 		
 		fs >> m;
 		fs >> n;
-		cursorX = m / 2;
+		cursorX = n / 2;
 		cursorY = m / 2;
 		
 		int g = 0;
@@ -259,21 +288,96 @@ public:
 			fs.close();
 			return;
 		}
+		fs << m << " " << n << std::endl;
+		for(int i = 0;i < m;i++){
+			for(int j = 0;j < maxVeld / 2 + maxVeld % 2 + 1;j++){
+				int g = beschrijvingH[i][j];
+				fs << g;
+				if(g != 0) fs << " ";
+				else break;
+			}
+			fs << std::endl;
+		}
+		for(int i = 0;i < n;i++){
+			for(int j = 0;j < maxVeld / 2 + maxVeld % 2 + 1;j++){
+				int g = beschrijvingV[i][j];
+				fs << g;
+				if(g != 0) fs << " ";
+				else break;
+			}
+			fs << std::endl;
+		}
 	}
 	
 	void beeldLees(){
-		controleer();
+		leeg();
+		teken(false);
+		std::cout << "Geef een invoerbestand om het beeld uit te lezen: ";
+		std::string f = vraagBestand();
+		std::fstream fs(f.c_str(), std::ios_base::in);
+		if(!fs.is_open()){
+			std::cout << "Kon het bestand '" << f << "' niet openen." << std::endl;
+			fs.close();
+			return;
+		}
+		fs >> m;
+		fs >> n;
+		cursorX = n / 2;
+		cursorY = m / 2;
+		
+		char c = fs.get();
+		for(int y = 0;y < m;y++){
+			while(c == '\n') c = fs.get();
+			for(int x = 0;x < n;x++){
+				if(c == '1') veld[x][y] = true;
+				c = fs.get();
+			}
+		}
+		beschrijvingUpdate();
 	}
 	
 	void beeldSchrijf(){
-		
+		teken(false);
+		std::cout << "Geef een invoerbestand om het beeld naar te schrijven: ";
+		std::string f = vraagBestand();
+		std::fstream fs(f.c_str(), std::ios_base::out);
+		if(!fs.is_open()){
+			std::cout << "Kon het bestand '" << f << "' niet openen." << std::endl;
+			fs.close();
+			return;
+		}
+		fs << m << " " << n << std::endl;
+		for(int y = 0;y < m;y++){
+			for(int x = 0;x < n;x++){
+				fs << veld[x][y];
+			}
+			fs << std::endl;
+		}
 	}
 	
 	void wijzigGrootte(){
 		beschrijvingNul();
 		leeg();
 		
+		char c = std::cin.get();
+		while(c != '\n') c = std::cin.get();
 		
+		int nieuwN, nieuwM;
+		bool nGeldig = false, mGeldig = false;
+		while(!nGeldig){
+			std::cout << "Geef een nieuwe hoogte(1-100): ";
+			nieuwN = leesgetal(100);
+			if(nieuwN > 0) nGeldig = true;
+			else std::cout << "Ongeldige hoogte. ";
+		}
+		n = nieuwN;
+		while(!mGeldig){
+			std::cout << "Geef een nieuwe breedte(1-100): ";
+			nieuwM = leesgetal(100);
+			if(nieuwM > 0) mGeldig = true;
+			else std::cout << "Ongeldige breedte. ";
+		}
+		m = nieuwM;
 		
 		controleer();
 	}
