@@ -36,7 +36,35 @@ public:
 		cursorY = n / 2;
 		menuDiepte = 0;
 		randomP = 50;
-		getal = time(0);
+		cursorOptie = 0;
+		controleer();
+	}
+	
+	bool isGetal(char c){
+		return c >= '0' && c <= '9';
+	}
+	
+	int leesgetal(int maximum){
+		int getal = 0;
+		bool beeindig = false;
+		char c = std::cin.get();
+		while(c == '\n') c = std::cin.get(); //Negeer voorloop-enters
+		//Lees tot enter
+		while(c != '\n'){
+			if(isGetal(c) && !beeindig){
+				int nieuwGetal = getal * 10 + (c - '0');
+				if(nieuwGetal > maximum) beeindig = true; //Laat functie doorlezen tot eerstvolgende enter
+				else getal = nieuwGetal;
+			}
+			c = std::cin.get();
+		}
+		return getal;
+	}
+	
+	char leesoptie(){
+		char optie = std::cin.get();
+		while(optie == '\n') optie = std::cin.get(); //Negeer newlines
+		return optie;
 	}
 	
 	char beschrijvingChar(int beschrijvingGetal){
@@ -44,7 +72,13 @@ public:
 		else return 'A' + (beschrijvingGetal - 10);
 	}
 	
-	void teken(){
+	void controleer(){
+		for(int x = 0;x < n;x++){
+			
+		}
+	}
+	
+	void teken(bool metMenu){
 		for(int i = 0;i < 2 * n + 2;i++) std::cout << "-";
 		std::cout << std::endl;
 		for(int y = 0;y < m;y++){
@@ -59,9 +93,11 @@ public:
 				if(b == 0) break;
 				std::cout << " " << beschrijvingChar(b);
 			}
+			if(goedH[y]) std::cout << "  V";
 			std::cout << std::endl;
 		}
 		for(int i = 0;i < 2 * n + 2;i++) std::cout << "-";
+		std::cout << std::endl;
 		for(int y = 0;y < maxVeld / 2 + maxVeld % 2 + 1;y++){
 			bool schrijf = false;
 			std::string buffer = "";
@@ -78,12 +114,13 @@ public:
 				break;
 			}
 		}
-		std::cout << std::endl;
-		if(menuDiepte == 0){
-			std::cout << "S[T]op,[O]pties,[W]Omhoog,[S]Omlaag,[A]Links,[D]Rechts,[F]Toggle,[R]andom" << std::endl;
-			std::cout << "[L]eeg,Beschrijving:[C]Lees[V]Schrijf[B]update[N]ul,Beeld:[J]Lees[K]Schrijf" << std::endl;
-		}else if(menuDiepte == 1){
-			std::cout << "[T]erug,[G]rootte wijzigen,[R]andompercentage" << std::endl;
+		if(metMenu){
+			if(menuDiepte == 0){
+				std::cout << "S[T]op,[O]pties,[W]Omhoog,[S]Omlaag,[A]Links,[D]Rechts,[F]Toggle,[R]andom" << std::endl;
+				std::cout << "[L]eeg,Beschrijving:[C]Lees[V]Schrijf[B]update[N]ul,Beeld:[J]Lees[K]Schrijf" << std::endl;
+			}else if(menuDiepte == 1){
+				std::cout << "[T]erug,[G]rootte wijzigen,[C]ursoropties,[R]andompercentage" << std::endl;
+			}
 		}
 	}
 	
@@ -94,14 +131,20 @@ public:
 		if(cursorX >= n) cursorX = n - 1;
 		if(cursorY < 0) cursorY = 0;
 		if(cursorY >= m) cursorY = m - 1;
+		
+		if(cursorOptie == 1) veld[cursorX][cursorY] = true;
+		if(cursorOptie == 2) veld[cursorX][cursorY] = false;
+		
+		if(cursorOptie != 0) controleer();
 	}
 	
 	void toggleCursor(){
 		veld[cursorX][cursorY] = !veld[cursorX][cursorY];
+		controleer();
 	}
 	
 	int randomPercentage(){
-		//static int getal = time(0);
+		static int getal = time(0);
 		getal = (221 * getal + 1) % 1000;
 		return getal % 100;
 	}
@@ -110,20 +153,32 @@ public:
 		for(int x = 0;x < n;x++) for(int y = 0;y < m;y++){
 			veld[x][y] = randomPercentage() < randomP;
 		}
+		controleer();
 	}
 	
 	void leeg(){
 		for(int x = 0;x < n;x++) for(int y = 0;y < m;y++){
 			veld[x][y] = 0;
 		}
+		controleer();
 	}
 	
-	void beschrijvingLees(){
-		
+	std::string vraagBestand(){
+		std::string out = "";
+		char c = std::cin.get();
+		while(c == '\n') c = std::cin.get(); //Negeer voorloop-enters
+		while(c != '\n'){
+			out += c;
+			c = std::cin.get();
+		}
+		return out;
 	}
 	
-	void beschrijvingSchrijf(){
-		
+	void beschrijvingNul(){
+		for(int i = 0;i < maxVeld;i++) for(int j = 0;j < maxVeld / 2 + maxVeld % 2 + 1;j++){
+			beschrijvingV[i][j] = 0;
+			beschrijvingH[i][j] = 0;
+		}
 	}
 	
 	void beschrijvingUpdate(){
@@ -156,27 +211,84 @@ public:
 			beschrijvingV[i][iV] = 0;
 			beschrijvingH[i][iH] = 0;
 		}
+		controleer();
 	}
 	
-	void beschrijvingNul(){
-		for(int i = 0;i < maxVeld;i++) for(int j = 0;j < maxVeld / 2 + maxVeld % 2 + 1;j++){
-			beschrijvingV[i][j] = 0;
-			beschrijvingH[i][j] = 0;
+	void beschrijvingLees(){
+		beschrijvingNul();
+		teken(false);
+		std::cout << "Geef een invoerbestand om de beschrijvingen uit te lezen: ";
+		std::string f = vraagBestand();
+		std::fstream fs(f.c_str(), std::ios_base::in);
+		if(!fs.is_open()){
+			std::cout << "Kon het bestand '" << f << "' niet openen." << std::endl;
+			fs.close();
+			return;
+		}
+		
+		fs >> m;
+		fs >> n;
+		cursorX = m / 2;
+		cursorY = m / 2;
+		
+		int g = 0;
+		for(int i = 0;i < m;i++){
+			for(int j = 0;j < maxVeld / 2 + maxVeld % 2 + 1;j++){
+				fs >> g;
+				if(g == 0) break;
+				beschrijvingH[i][j] = g;
+			}
+		}
+		for(int i = 0;i < n;i++){
+			for(int j = 0;j < maxVeld / 2 + maxVeld % 2 + 1;j++){
+				fs >> g;
+				if(g == 0) break;
+				beschrijvingV[i][j] = g;
+			}
+		}
+		controleer();
+	}
+	
+	void beschrijvingSchrijf(){
+		teken(false);
+		std::cout << "Geef een invoerbestand om de beschrijvingen naar te schrijven: ";
+		std::string f = vraagBestand();
+		std::fstream fs(f.c_str(), std::ios_base::out);
+		if(!fs.is_open()){
+			std::cout << "Kon het bestand '" << f << "' niet openen." << std::endl;
+			fs.close();
+			return;
 		}
 	}
 	
 	void beeldLees(){
-		
+		controleer();
 	}
 	
 	void beeldSchrijf(){
 		
 	}
 	
+	void wijzigGrootte(){
+		beschrijvingNul();
+		leeg();
+		
+		
+		
+		controleer();
+	}
+	
+	void cursorOpties(){
+		
+	}
+	
+	void wijzigRandomP(){
+		
+	}
+	
 	void menu(){
-		teken();
-		char c = std::cin.get();
-		while(c == '\n') c = std::cin.get(); //Negeer newlines
+		teken(true);
+		char c = leesoptie();
 		if(menuDiepte == 0){
 			if(c == 't' || c == 'T') stop = 1;
 			if(c == 'o' || c == 'O') menuDiepte = 1;
@@ -194,15 +306,19 @@ public:
 			if(c == 'j' || c == 'J') beeldLees();
 			if(c == 'k' || c == 'K') beeldSchrijf();
 		}else if(menuDiepte == 1){
-			
+			if(c == 't' || c == 'T') menuDiepte = 0;
+			if(c == 'g' || c == 'G') wijzigGrootte();
+			if(c == 'c' || c == 'C') cursorOpties();
+			if(c == 'r' || c == 'R') wijzigRandomP();
 		}
 	}
 	
 	int stop;
 private:
 	const static int maxVeld = 100;
-	int m, n, cursorX, cursorY, menuDiepte, randomP, getal;
-	bool veld[maxVeld][maxVeld] = {false};
+	//cursorOptie: 0 is doe niets, 1 is zet aan, 2 is zet uit
+	int m, n, cursorX, cursorY, menuDiepte, randomP, cursorOptie;
+	bool veld[maxVeld][maxVeld] = {false}, goedH[maxVeld] = {false}, goedV[maxVeld] = {false};
 	//In het slechtste geval, alternerend true en false, zijn er maxVeld / 2
 	//resp. maxVeld / 2 + 1 ints nodig om een beschrijving te genereren op een
 	//even resp. oneven zijdig veld. Daarna nog + 1 voor een afsluitnul
