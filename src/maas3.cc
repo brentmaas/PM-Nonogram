@@ -209,6 +209,7 @@ public:
 			beschrijvingV[i][j] = 0;
 			beschrijvingH[i][j] = 0;
 		}
+		controleer();
 	}
 	
 	void beschrijvingUpdate(){
@@ -244,8 +245,8 @@ public:
 	}
 	
 	void beschrijvingLees(){
-		beschrijvingNul();
 		teken(false);
+		beschrijvingNul();
 		std::cout << "Geef een invoerbestand om de beschrijvingen uit te lezen: ";
 		std::string f = vraagBestand();
 		std::fstream fs(f.c_str(), std::ios_base::in);
@@ -275,6 +276,7 @@ public:
 				beschrijvingV[i][j] = g;
 			}
 		}
+		leeg();
 		controleer();
 	}
 	
@@ -310,8 +312,8 @@ public:
 	}
 	
 	void beeldLees(){
-		leeg();
 		teken(false);
+		leeg();
 		std::cout << "Geef een invoerbestand om het beeld uit te lezen: ";
 		std::string f = vraagBestand();
 		std::fstream fs(f.c_str(), std::ios_base::in);
@@ -333,6 +335,7 @@ public:
 				c = fs.get();
 			}
 		}
+		fs.close();
 		beschrijvingUpdate();
 	}
 	
@@ -353,9 +356,11 @@ public:
 			}
 			fs << std::endl;
 		}
+		fs.close();
 	}
 	
 	void wijzigGrootte(){
+		teken(false);
 		beschrijvingNul();
 		leeg();
 		
@@ -363,19 +368,18 @@ public:
 		while(c != '\n') c = std::cin.get();
 		
 		int nieuwN, nieuwM;
-		bool nGeldig = false, mGeldig = false;
-		while(!nGeldig){
-			std::cout << "Geef een nieuwe hoogte(1-100): ";
+		while(true){
+			std::cout << "Geef een nieuwe hoogte(1-100) (huidig: " << n << "): ";
 			nieuwN = leesgetal(100);
-			if(nieuwN > 0) nGeldig = true;
-			else std::cout << "Ongeldige hoogte. ";
+			if(nieuwN > 0) break;
+			else std::cout << "Hoogte moet meer dan nul zijn. ";
 		}
 		n = nieuwN;
-		while(!mGeldig){
-			std::cout << "Geef een nieuwe breedte(1-100): ";
+		while(true){
+			std::cout << "Geef een nieuwe breedte(1-100) (huidig: " << m << "): ";
 			nieuwM = leesgetal(100);
-			if(nieuwM > 0) mGeldig = true;
-			else std::cout << "Ongeldige breedte. ";
+			if(nieuwM > 0) break;
+			else std::cout << "Breedte moet meer dan nul zijn. ";
 		}
 		m = nieuwM;
 		
@@ -383,11 +387,31 @@ public:
 	}
 	
 	void cursorOpties(){
-		
+		teken(false);
+		std::cout << "Cursoropties:" << std::endl;
+		std::cout << "[0] Doe niets" << std::endl;
+		std::cout << "[1] Zet doelpositie aan" << std::endl;
+		std::cout << "[2] Zet doelpositie uit" << std::endl;
+		int nieuwC;
+		while(true){
+			std::cout << "Kies een optie: ";
+			nieuwC = leesgetal(2);
+			if(nieuwC >= 0) break;
+			std::cout << "Ongeldige optie. ";
+		}
+		cursorOptie = nieuwC;
 	}
 	
 	void wijzigRandomP(){
-		
+		teken(false);
+		int nieuwRP;
+		while(true){
+			std::cout << "Geef een nieuw random percentage(0-100) (huidig: " << randomP << "): ";
+			nieuwRP = leesgetal(100);
+			if(nieuwRP >= 0) break;
+			else std::cout << "Percentage moet meer dan of gelijk aan nul zijn. ";
+		}
+		randomP = nieuwRP;
 	}
 	
 	void menu(){
