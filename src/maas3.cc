@@ -5,7 +5,9 @@
  *          genereren van beschrijvingen aan de hand van een huidig beeld, en
  *          simpele bewerkingen van het huidige beeld.
  * Getest op: Windows 10 + MSys2 (MinGW64) met g++ 8.2.0
+ *            Ubuntu 16.04 LTS met g++ 5.4.0
  * Getest met: g++ -o Assignment3 maas3.cc -std=c++17 -Wall -Wextra
+ *             g++ -o Assignment3 maas3.cc -std=c++11 -Wall -Wextra
  * Laatst bewerkt: 08/11/2018
  */
 
@@ -703,11 +705,11 @@ private:
 	//cursorOptie: 0 is doe niets, 1 is zet aan, 2 is zet uit
 	int m, n, cursorX, cursorY, menuDiepte, randomP, cursorOptie;
 	//Beeld, goede rijen, goede kolommen
-	bool veld[maxVeld][maxVeld] = {false}, goedH[maxVeld] = {true}, goedV[maxVeld] = {true};
+	bool veld[maxVeld][maxVeld] = {{false}}, goedH[maxVeld] = {true}, goedV[maxVeld] = {true};
 	//In het slechtste geval, alternerend true en false, zijn er maxVeld / 2
 	//resp. maxVeld / 2 + 1 ints nodig om een beschrijving te genereren op een
 	//even resp. oneven zijdig veld. Daarna nog + 1 voor een afsluitnul
-	int beschrijvingV[maxVeld][maxVeld / 2 + maxVeld % 2 + 1] = {0}, beschrijvingH[maxVeld][maxVeld / 2 + maxVeld % 2 + 1] = {0};
+	int beschrijvingV[maxVeld][maxVeld / 2 + maxVeld % 2 + 1] = {{0}}, beschrijvingH[maxVeld][maxVeld / 2 + maxVeld % 2 + 1] = {{0}};
 };
 
 int main(){
