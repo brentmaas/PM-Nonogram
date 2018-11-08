@@ -6,7 +6,7 @@
  *          simpele bewerkingen van het huidige beeld.
  * Getest op: Windows 10 + MSys2 (MinGW64) met g++ 8.2.0
  * Getest met: g++ -o Assignment3 maas3.cc -std=c++17 -Wall -Wextra
- * Laatst bewerkt: 05/11/2018
+ * Laatst bewerkt: 08/11/2018
  */
 
 #include <iostream>
@@ -28,7 +28,7 @@ void infoBlokje(){
 	"programma de beschrijvingen te laten maken. Beelden en beschrijvingen\n"
 	"kunnen worden gelezen of geschreven. Het beeld kan ook willekeurig\n"
 	"worden gevuld aan de hand van een gegeven percentage.\n"
-	"Laatst bewerkt: 05/11/2018\n"
+	"Laatst bewerkt: 08/11/2018\n"
 	"////////////////////////////////////////////////\n" << std::endl;
 }
 
