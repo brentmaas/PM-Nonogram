@@ -46,6 +46,7 @@ public:
 		menuDiepte = 0;
 		randomP = 50;
 		cursorOptie = 0;
+		controleer();
 	}
 	
 	//Controleer of een gegeven char een getal is
@@ -96,11 +97,11 @@ public:
 			goedV[i] = true;
 		}
 		//Controleer kolommen
-		for(int x = 0;x < maxVeld;x++){
+		for(int x = 0;x < n;x++){
 			//i: index van huidige blok, teller: lengte van huidige blok
 			int i = 0, teller = 0;
 			//Ga de kolom af
-			for(int y = 0;y < maxVeld;y++){
+			for(int y = 0;y < m;y++){
 				//Als een vakje aanstaat, tel eentje bij huidige blok op
 				if(veld[x][y]) teller++;
 				//Anders als de lengte van het huidige blok meer dan nul is,
@@ -123,11 +124,11 @@ public:
 			if(teller != beschrijvingV[x][i]) goedV[x] = false;
 		}
 		//Controleer rijen
-		for(int y = 0;y < maxVeld;y++){
+		for(int y = 0;y < m;y++){
 			//i: index van huidige blok, teller: lengte van huidige blok
 			int i = 0, teller = 0;
 			//Ga de rij af
-			for(int x = 0;x < maxVeld;x++){
+			for(int x = 0;x < n;x++){
 				//Als een vakje aanstaat, tel eentje bij huidige blok op
 				if(veld[x][y]) teller++;
 				//Anders als de lengte van het huidige blok meer dan nul is,
@@ -607,6 +608,10 @@ public:
 		}
 		//Zet de nieuwe breedte
 		m = nieuwM;
+		
+		//Zet nieuwe cursorpositie
+		cursorX = n / 2;
+		cursorY = m / 2;
 		
 		//Beeld en beschrijving gewijzegd; controleer beeld
 		controleer();
